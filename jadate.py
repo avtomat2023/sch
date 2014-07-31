@@ -12,17 +12,17 @@ class JaDate(datetime.date):
         最初の１桁が月、あとの２桁が日
     """
     @classmethod
-    def fromStr(cls, s):
+    def from_str(cls, s):
         if len(s) == 8:
             return JaDate(int(s[:4]), int(s[4:6]), int(s[6:]))
         elif len(s) == 4:
-            return JaDate._fromMonthAndDay(int(s[:2]), int(s[2:]))
+            return JaDate._from_month_and_day(int(s[:2]), int(s[2:]))
         elif len(s) == 3:
-            return JaDate._fromMonthAndDay(int(s[:1]), int(s[1:]))
+            return JaDate._from_month_and_day(int(s[:1]), int(s[1:]))
         else:
             raise ValueError('invalid length str given to fromStr')
 
-    def _fromMonthAndDay(m, d):
+    def _from_month_and_day(m, d):
         today = datetime.date.today()
         date = JaDate(today.year, m, d)
         if today <= date:
@@ -31,5 +31,5 @@ class JaDate(datetime.date):
             return JaDate(today.year + 1, m, d)
 
     WEEKDAYS = ("月", "火", "水", "木", "金", "土", "日")
-    def jaWeekday(self):
+    def ja_weekday(self):
         return JaDate.WEEKDAYS[self.weekday()]

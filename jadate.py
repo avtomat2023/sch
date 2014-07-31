@@ -19,6 +19,8 @@ class JaDate(datetime.date):
             return JaDate._fromMonthAndDay(int(s[:2]), int(s[2:]))
         elif len(s) == 3:
             return JaDate._fromMonthAndDay(int(s[:1]), int(s[1:]))
+        else:
+            raise ValueError('invalid length str given to fromStr')
 
     def _fromMonthAndDay(m, d):
         today = datetime.date.today()

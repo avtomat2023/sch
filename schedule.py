@@ -99,7 +99,7 @@ def print_fields(field_table):
     nfield = len(field_table[0])
     header = tuple([''] * (nfield-3) + ['予定日', 'NICE', '用事'])
     field_table.insert(0, header)
-    widths = [max(sum(strwidth(s)) for s in fields)
+    widths = [max(strwidth(s) for s in fields)
               for fields in zip(*field_table)]
 
     for fields in field_table:

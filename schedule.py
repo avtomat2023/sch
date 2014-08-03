@@ -12,11 +12,6 @@ PRIORITY_NORMAL_RANGE = range(-5, 6)
 PRIORITY_HIGH_RANGE = range(-15, -5)
 PRIORITY_EXTREME_RANGE = range(-20, -15)
 
-PRIORITY_LOW = 10
-PRIORITY_NORMAL = 0
-PRIORITY_HIGH = -10
-PRIORITY_EXTREME = -18
-
 # スケジュールファイルの、1行分のレコードを保持する
 # レコードがどのような形式か指定する責任は、Scheduleが持つ
 class Schedule:

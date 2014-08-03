@@ -1,5 +1,6 @@
 import sys
 import os
+import os.path
 import unicodedata
 from jadate import JaDate
 from datetime import timedelta
@@ -71,7 +72,9 @@ class Schedule:
             assert False, "Program Error"
 
 def read_schedule_file(filename):
-    schedules = []
+    if not os.path.exists(filename):
+        return []
+
     with open(filename) as f:
         schedules = [Schedule.from_record(line) for line in f if line]
     return schedules

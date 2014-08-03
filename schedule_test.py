@@ -18,6 +18,11 @@ class TestSchedule(unittest.TestCase):
         self.assertEqual(s.priority, -18)
         self.assertEqual(s.todo, 'アルゴリズム 課題提出')
 
+    def test_str(self):
+        line = '0 20140807 -18 アルゴリズム 課題提出'
+        s = Schedule.from_record(line + '\n')
+        self.assertEqual(str(s), line)
+
     def test_fields(self):
         s = Schedule.from_record('0 20140807 -18 アルゴリズム 課題提出\n')
         fields = s.fields()

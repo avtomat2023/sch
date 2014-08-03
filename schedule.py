@@ -35,6 +35,13 @@ class Schedule:
     def from_data(cls, date, priority, todo):
         return cls(False, date, priority, todo)
 
+    # 直接ファイルに書き出せる形式
+    def __str__(self):
+        done = str(int(self.done))
+        date = self.date.format('{year:04}{month:02}{day:02}')
+        prior = str(self.priority)
+        return ' '.join([done, date, prior, self.todo])
+
     def fields(self):
         date = self.date.format('{year}/{month:02}/{day:02}({weekday})')
         return [date, str(self.priority), self.todo]

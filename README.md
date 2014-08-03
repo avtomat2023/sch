@@ -2,6 +2,8 @@
 
 コマンドラインベースのTODOマネージャです。
 
+実行にはバージョン3のPythonが必要です。
+
 ## インストール
 
     git clone git://github.com/yoshrc/sch.git

@@ -9,7 +9,7 @@ sch - スケジュール管理プログラム
       日付が変わる前後に使うと、まずいことになる
 """
 
-from aprparse import ArgumentParser
+from argparse import ArgumentParser
 from schedule import ScheduleList
 import sys
 import os

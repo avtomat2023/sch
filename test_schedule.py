@@ -18,6 +18,15 @@ class TestSchedule(unittest.TestCase):
         self.assertEqual(s.priority, -18)
         self.assertEqual(s.todo, 'アルゴリズム 課題提出')
 
+    def test_from_input(self):
+        s = Schedule.from_input('20140807', 'e', 'アルゴリズム 課題提出')
+        self.assertFalse(s.done)
+        self.assertEqual(s.date.year, 2014)
+        self.assertEqual(s.date.month, 8)
+        self.assertEqual(s.date.day, 7)
+        self.assertEqual(s.priority, -18)
+        self.assertEqual(s.todo, 'アルゴリズム 課題提出')
+
     def test_str(self):
         line = '0 20140807 -18 アルゴリズム 課題提出'
         s = Schedule.from_record(line + '\n')

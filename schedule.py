@@ -32,10 +32,14 @@ class Schedule:
         priority = int(priority)
         return cls(done, date, priority, todo)
 
-    # 日付(JaDate)、優先度(int)、用事(str)を指定して、Scheduleを生成
+    # 日付、優先度、用事を指定して、Scheduleを生成
+    # 各項目は、入力された文字列をそのまま渡す
+    PRIORITY_TABLE = {'e':-18, 'h':-10, 'n':0, 'l':10}
     @classmethod
-    def from_data(cls, date, priority, todo):
-        return cls(False, date, priority, todo)
+    def from_input(cls, date, priority, todo):
+        if priority.lower() in Schedule.PRIORITY_TABLE:
+            priority = Schedule.PRIORITY_TABLE[priority]
+        return cls(False, JaDate.from_str(date, TODAY), int(priority), todo)
 
     # 直接ファイルに書き出せる形式
     def __str__(self):

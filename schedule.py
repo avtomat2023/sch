@@ -37,7 +37,7 @@ class Schedule:
 
     def fields(self):
         date = self.date.format('{year}/{month:02}/{day:02}({weekday})')
-        return (date, str(self.priority), self.todo)
+        return [date, str(self.priority), self.todo]
 
     # 過去の予定に関しては、Trueを返す
     def is_urgent(self):
@@ -80,7 +80,7 @@ def make_field_table(schedules, filter, fields_getter):
 def charwidth(char):
     # 私の環境では、Full-widthもAmbiguousもNot East Asianも
     # 半角文字として扱われていた
-    if unicodedate.east_asian_width(char) == 'W':
+    if unicodedata.east_asian_width(char) == 'W':
         return 2
     else:
         return 1

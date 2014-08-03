@@ -14,7 +14,6 @@ PRIORITY_HIGH_RANGE = range(-15, -5)
 PRIORITY_EXTREME_RANGE = range(-20, -15)
 
 # スケジュールファイルの、1行分のレコードを保持する
-# レコードがどのような形式か指定する責任は、Scheduleが持つ
 class Schedule:
     def __init__(self, *data):
         self.done, self.date, self.priority, self.todo = data
@@ -124,7 +123,7 @@ def write_to_schedule_file(schedule_list, filename):
 #   Schedule: (2014/08/05(火), -10, 講演会)
 # この時、make_fields_table関数により、以下のリストを得たい。
 #   [ ('', '2014/08/04(月)', '0', '飲み会'),
-#     ('a', '2014/08/05(月)', '-10', '講演会'),
+#     ('*', '2014/08/05(月)', '-10', '講演会'),
 #     ('', '2014/08/07(木)', '-18', '課題提出') ]
 # filterとして、8月1日の予定を弾く関数を渡し、
 # fields_getterとして、Scheduleを文字列の4-タプルに変換する関数を渡せば良い

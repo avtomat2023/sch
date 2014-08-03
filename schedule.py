@@ -100,7 +100,7 @@ def strwidth(s):
     return sum(charwidth(c) for c in s)
 
 def print_fields(field_table):
-    print(TODAY.format('{year}年{month}月{day}日　{weekday}曜日'))
+    print(TODAY.format('*** {year}年{month}月{day}日　{weekday}曜日 ***'))
 
     if not field_table:
         print('予定はありません')
@@ -115,5 +115,5 @@ def print_fields(field_table):
     for fields in field_table:
         for field, width in zip(fields, widths):
             s = field + ' ' * (width - strwidth(field))
-            print(s, end=' ')
+            print(s, end='  ')
         print()

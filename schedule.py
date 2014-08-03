@@ -4,6 +4,8 @@ import unicodedata
 from jadate import JaDate
 from datetime import timedelta
 
+TODAY = JaDate.today()
+
 PRIORITY_RANGE = range(-20,20)
 PRIORITY_LOW_RANGE = range(6, 20)
 PRIORITY_NORMAL_RANGE = range(-5, 6)
@@ -26,7 +28,7 @@ class Schedule:
     def from_record(cls, line):
         done, date, priority, todo = line.rstrip().split(' ', 3)
         done = bool(int(done))
-        date = JaDate.from_str(date)
+        date = JaDate.from_str(date, TODAY)
         priority = int(priority)
         return cls(done, date, priority, todo)
 
@@ -48,16 +50,15 @@ class Schedule:
 
     # 過去の予定に関しては、Trueを返す
     def is_urgent(self):
-        today = JaDate.today()
         day = lambda d: timedelta(days=d)
         if self.priority in PRIORITY_EXTREME_RANGE:
             return True
         elif self.priority in PRIORITY_HIGH_RANGE:
-            return self.date - today <= day(30)
+            return self.date - TODAY <= day(30)
         elif self.priority in PRIORITY_NORMAL_RANGE:
-            return self.date - today <= day(7)
+            return self.date - TODAY <= day(7)
         elif self.priority in PRIORITY_LOW_RANGE:
-            return self.date - today <= day(3)
+            return self.date - TODAY <= day(3)
         else:
             assert False, "Program Error"
 
@@ -83,6 +84,9 @@ def read_schedule_file(filename):
 def make_field_table(schedules, filter, fields_getter):
     return [fields_getter(s) for s in schedules if filter(s)]
 
+def make_filter(filters, whitelist):
+    return lambda s: all(f(s) for f in filters) or s in whitelist
+
 # charの端末上での文字幅を返す
 def charwidth(char):
     # 私の環境では、Full-widthもAmbiguousもNot East Asianも
@@ -96,8 +100,7 @@ def strwidth(s):
     return sum(charwidth(c) for c in s)
 
 def print_fields(field_table):
-    today = JaDate.today()
-    print(today.format('{year}年{month}月{day}日　{weekday}曜日'))
+    print(TODAY.format('{year}年{month}月{day}日　{weekday}曜日'))
 
     if not field_table:
         print('予定はありません')
@@ -114,120 +117,3 @@ def print_fields(field_table):
             s = field + ' ' * (width - strwidth(field))
             print(s, end=' ')
         print()
-
-"""
-    # upcomingとoutdatedをソートし、scheduleIDsを更新する
-    def _rehashSchedules(self):
-        self.outdated.sort(key = lambda s: s.date)
-        self.upcoming.sort(key = lambda s: s.date)
-        self.scheduleIDs = {}
-        i, iDone = -1, -1
-        for s in reversed(self.outdated):
-            if s.done:
-                self.scheduleIDs[s] = 'd'+str(iDone)
-                iDone -= 1
-            else:
-                self.scheduleIDs[s] = str(i)
-                i -= 1
-        i, iDone = 0, 0
-        for s in self.upcoming:
-            if s.isUrgent():
-                if s.done:
-                    self.scheduleIDs[s] = 'd'+str(iDone)
-                    iDone += 1
-                else:
-                    self.scheduleIDs[s] = str(i)
-                    i += 1
-        for s in self.upcoming:
-            if not s.isUrgent():
-                if s.done:
-                    self.scheduleIDs[s] = 'd'+str(iDone)
-                    iDone += 1
-                else:
-                    self.scheduleIDs[s] = str(i)
-                    i += 1
-        self._isHashed = True
-
-    def print(self, isHumanReadable, doesShowAll, doesShowDone):
-        if not self._isHashed:
-            self._rehashSchedules()
-
-        toNotify = self._selectSchedulesToNotify(doesShowAll, doesShowDone)
-        if isHumanReadable:
-            self._notifyHumanReadable(toNotify)
-        else:
-            self._notifyInNormalForm(toNotify)
-
-    def _selectSchedulesToNotify(self, doesShowAll, doesShowDone):
-        toNotify = []
-        for s in self.upcoming:
-            if not s.done or doesShowDone:
-                if doesShowAll:
-                    toNotify.append(s)
-                else:
-                    if s.isUrgent():
-                        toNotify.append(s)
-        return toNotify
-
-    def _notifyInNormalForm(self, notifyList):
-        for s in notifyList:
-            print('[' + self.scheduleIDs[s] + '] ', end='')
-            print(s)
-
-    def _notifyHumanReadable(self, notifyList):
-        today = JaDate.today()
-        print("%s %s" % (today, today.jaWeekday()+"曜日"))
-
-        if len(notifyList) > 0:
-            maxIDLen = max(len(self.scheduleIDs[s]) for s in notifyList)
-            print(' ' * (maxIDLen+3), end='')
-            print(Schedule.headline())
-            for s in notifyList:
-                print('[' + self.scheduleIDs[s] + '] ', end='')
-                print(s.prettyStr())
-        else:
-            print("予定はありません。")
-
-    def add(self, givenArgs):
-        date = JaDate.fromStr(givenArgs[0])
-        priority = int(givenArgs[1])
-        todo = givenArgs[2]
-        newSchedule = Schedule.fromData(date, priority, todo)
-
-        today = JaDate.today()
-        if newSchedule.date >= today:
-            self.upcoming.append(newSchedule)
-        else:
-            self.outdated.append(newSchedule)
-        self._isHashed = False
-
-    def edit(self, givenArgs):
-        self._isHashed = False
-
-    def done(self, scheduleID):
-        for s, sid in self.scheduleIDs.items():
-            if sid == scheduleID:
-                s.done = 1
-                self._isHashed = False
-                break
-        else:
-            print(scheduleID + "に対応するスケジュールが見つかりません。",
-                  file=sys.stderr)
-
-    def write(self, filename):
-        if not self._isHashed:
-            self._rehashSchedules()
-
-        # UNIX系OSの場合は、renameとremoveの仕様上、うまくいく
-        # （たぶんPOSIXのレベルで保証される）
-        # Windowsではエラーになる
-        # filenameがリンクだとまずいことになる
-        tmpfilename = '/tmp/sch-tmpfile.' + str(os.getpid())
-        f = open(tmpfilename, 'w')
-        for s in self.outdated:
-            print(s.done, s, file=f)
-        for s in self.upcoming:
-            print(s.done, s, file=f)
-        os.rename(tmpfilename, filename)
-        f.close()
-"""

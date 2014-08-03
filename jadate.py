@@ -12,18 +12,18 @@ class JaDate(datetime.date):
         最初の１桁が月、あとの２桁が日
     """
     @classmethod
-    def from_str(cls, s):
+    def from_str(cls, s, today):
         if len(s) == 8:
             return JaDate(int(s[:4]), int(s[4:6]), int(s[6:]))
         elif len(s) == 4:
-            return JaDate._from_month_and_day(int(s[:2]), int(s[2:]))
+            return JaDate._from_month_and_day(int(s[:2]), int(s[2:]), today)
         elif len(s) == 3:
-            return JaDate._from_month_and_day(int(s[:1]), int(s[1:]))
+            return JaDate._from_month_and_day(int(s[:1]), int(s[1:]), today)
         else:
             raise ValueError('invalid length str given to fromStr')
 
-    def _from_month_and_day(m, d):
-        today = datetime.date.today()
+    @staticmethod
+    def _from_month_and_day(m, d, today):
         date = JaDate(today.year, m, d)
         if today <= date:
             return date

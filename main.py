@@ -55,7 +55,7 @@ mdd      : 本日以降の直近の月日を指定
 e:最優先(Extreme) h:高(High) n:通常(Normal) l:低(Low)
 """
 parser_add = subparsers.add_parser(
-    'add', add_help=False,
+    'add', aliases=['a'], add_help=False,
     help='指定された日付,優先度,用事の予定を追加します'
 )
 parser_add.add_argument(
@@ -76,7 +76,7 @@ parser_add.add_argument(
 parser_add.set_defaults(subcommand=add)
 
 parser_done = subparsers.add_parser(
-    'done', add_help=False, help='実行済みの予定を選択します'
+    'done', aliases=['d'], add_help=False, help='実行済みの予定を選択します'
 )
 parser_done.set_defaults(subcommand=done)
 

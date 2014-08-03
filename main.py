@@ -19,9 +19,17 @@ def filter_done(sch):
 DATAFILENAME = os.path.join(os.path.dirname(__file__), 'schedule-list')
 
 def show(schedule_list, args, filters):
+    if args.show_done:
+        def fields(s):
+            if s.done:
+                return ('d',) + s.fields()
+            else:
+                return ('',) + s.fields()
+    else:
+        def fields(s):
+            return s.fields()
     filter = schedule.make_filter(filters, [])
-    table = schedule.make_field_table(schedule_list, filter,
-                                      methodcaller('fields'))
+    table = schedule.make_field_table(schedule_list, filter, fields)
     schedule.print_fields(table)
 
 def add(schedule_list, args, filters):
@@ -36,13 +44,50 @@ def add(schedule_list, args, filters):
     def fields(s):
         if s is to_add:
             return ('*',) + s.fields()
+        elif s.done:
+            return ('d',) + s.fields()
         else:
             return ('',) + s.fields()
     table = schedule.make_field_table(schedule_list, filter, fields)
     schedule.print_fields(table)
 
 def done(schedule_list, args, filters):
-    print('command done:', args)
+    select = [(i,s) for (i,s) in enumerate(schedule_list)
+              if all(f(s) for f in filters) and not s.done]
+    if not select:
+        print('予定はありません。')
+        return
+
+    schedules = [s for (i,s) in select]
+    numbers = {id(s):n for (n,(i,s)) in enumerate(select)}
+
+    print('実行済みの予定を番号で選択してください。')
+    print('複数選択する場合、半角スペースで区切ってください。')
+    print()
+    def fields(s):
+        return (str(numbers[id(s)]) + ':',) + s.fields()
+    table = schedule.make_field_table(schedules, lambda x:True, fields)
+    schedule.print_fields(table, False)
+    print()
+
+    done_nums = [int(s) for s in input('> ').split()
+                 if int(s) in range(len(schedules))]
+    for n in done_nums:
+        schedules[n].done = True
+    schedule.write_to_schedule_file(schedule_list, DATAFILENAME)
+
+    print()
+    print(str(len(done_nums)) + '個の予定を実行済みにしました。')
+    filter = schedule.make_filter(filters, [schedules[n] for n in done_nums])
+    def fields(s):
+        if numbers.get(id(s)) in done_nums:
+            return ('*',) + s.fields()
+        elif s.done:
+            return ('d',) + s.fields()
+        else:
+            return ('',) + s.fields()
+    table = schedule.make_field_table(schedule_list, filter, fields)
+    schedule.print_fields(table)
 
 parser = ArgumentParser(description='コマンドラインベースTODOマネージャ',
                         add_help=False)
@@ -115,7 +160,8 @@ if __name__ == '__main__':
         show(schedule_list, args, filters)
 
 """
-trapするより、renameのアトミック性を利用した方がいい(man rename参照)
+ファイルの上書きの際は、終了シグナルをtrapするより、
+renameのアトミック性を利用した方がいい(man rename参照)
 
 ファイル書き込みの旧実装:
     handlers = ignoreExitSignals()

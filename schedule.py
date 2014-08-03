@@ -114,8 +114,9 @@ def charwidth(char):
 def strwidth(s):
     return sum(charwidth(c) for c in s)
 
-def print_fields(field_table):
-    print(TODAY.format('*** {year}年{month}月{day}日　{weekday}曜日 ***'))
+def print_fields(field_table, print_headline=True):
+    if print_headline:
+        print(TODAY.format('*** {year}年{month}月{day}日　{weekday}曜日 ***'))
 
     if not field_table:
         print('予定はありません')

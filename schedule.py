@@ -79,6 +79,35 @@ def read_schedule_file(filename):
         schedules = [Schedule.from_record(line) for line in f if line]
     return schedules
 
+
+"""
+ファイルの上書きの際は、終了シグナルをtrapするより、
+renameのアトミック性を利用した方がいい(man rename参照)
+
+ファイル書き込みの旧実装:
+    handlers = ignoreExitSignals()
+    f = open(DATAFILENAME, 'w')
+    # write on f
+    f.close()
+    restoreExitSignalHandlers(handlers)
+これだと、writeの間中シグナルを受け付けなくなる
+一旦一時ファイルに書き出して、renameする方がいい
+だが、inode番号が変わるため、ハードリンクがある場合は使えない
+
+def ignoreExitSignals():
+    import signal
+    signals = [signal.SIGHUP, signal.SIGINT, signal.SIGQUIT, signal.SIGTERM]
+    handlerDictionary = {}
+    for s in signals:
+        handlerDictionary[s] = signal.getsignal(s)
+        signal.signal(s, SIG_IGN)
+    return handlerDictionary
+
+def restoreExitSignalHandlers(handlerDictionary):
+    import signal
+    for sig in handlerDictionary:
+        signal.signal(sig, handlerDictionary[sig])
+"""
 def write_to_schedule_file(schedule_list, filename):
     tmp = '__tmpfile__'
     with open(tmp, 'w') as f:

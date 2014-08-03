@@ -160,32 +160,3 @@ if __name__ == '__main__':
         args.subcommand(schedule_list, args, filters)
     else:
         show(schedule_list, args, filters)
-
-"""
-ファイルの上書きの際は、終了シグナルをtrapするより、
-renameのアトミック性を利用した方がいい(man rename参照)
-
-ファイル書き込みの旧実装:
-    handlers = ignoreExitSignals()
-    f = open(DATAFILENAME, 'w')
-    # write on f
-    f.close()
-    restoreExitSignalHandlers(handlers)
-これだと、writeの間中シグナルを受け付けなくなる
-一旦一時ファイルに書き出して、renameする方がいい
-だが、inode番号が変わるため、ハードリンクがある場合は使えない
-
-def ignoreExitSignals():
-    import signal
-    signals = [signal.SIGHUP, signal.SIGINT, signal.SIGQUIT, signal.SIGTERM]
-    handlerDictionary = {}
-    for s in signals:
-        handlerDictionary[s] = signal.getsignal(s)
-        signal.signal(s, SIG_IGN)
-    return handlerDictionary
-
-def restoreExitSignalHandlers(handlerDictionary):
-    import signal
-    for sig in handlerDictionary:
-        signal.signal(sig, handlerDictionary[sig])
-"""

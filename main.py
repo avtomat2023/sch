@@ -24,19 +24,18 @@ def filter_low_priority(sch):
 def filter_done(sch):
     return not sch.done
 
-# DATAFILENAME = os.path.join(os.getenv("MYTOOL"), 'sch/schedule-list')
-DATAFILENAME = os.path.join(os.getenv("MYTOOL"), 'sch2/schedule-list')
+DATAFILENAME = os.path.join(os.path.dirname(__file__), 'schedule-list')
 
-def show(schedule_list, filters):
+def show(schedule_list, args, filters):
     filter = schedule.make_filter(filters, [])
     table = schedule.make_field_table(schedule_list, filter,
                                       lambda s: tuple(s.fields()))
     schedule.print_fields(table)
 
-def add(schedule_list, filters):
+def add(schedule_list, args, filters):
     print('command add:', args)
 
-def done(schedule_list, filters):
+def done(schedule_list, args, filters):
     print('command done:', args)
 
 parser = ArgumentParser(description='コマンドラインベースTODOマネージャ',
@@ -105,29 +104,9 @@ if __name__ == '__main__':
         filters.append(filter_done)
 
     if 'subcommand' in args:
-        args.subcommand(schedule_list, filters)
+        args.subcommand(schedule_list, args, filters)
     else:
-        show(schedule_list, filters)
-
-    """
-    scheduleList = ScheduleList(DATAFILENAME)
-
-    willWrite = options.addList or options.editList or options.doneList
-    willNotify = (not willWrite or
-                  options.human or options.showAll or options.showDone)
-
-    if willWrite:
-        for s in options.editList:
-            scheduleList.edit(s)
-        for s in options.addList:
-            scheduleList.add(s)
-        for sid in options.doneList:
-            scheduleList.done(sid)
-        scheduleList.write(DATAFILENAME)    # writeの最初にソートする
-
-    if willNotify:
-        scheduleList.notify(options.human, options.showAll, options.showDone)
-    """
+        show(schedule_list, args, filters)
 
 """
 trapするより、renameのアトミック性を利用した方がいい(man rename参照)

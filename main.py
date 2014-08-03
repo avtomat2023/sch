@@ -55,7 +55,7 @@ def done(schedule_list, args, filters):
     select = [(i,s) for (i,s) in enumerate(schedule_list)
               if all(f(s) for f in filters) and not s.done]
     if not select:
-        print('予定はありません。')
+        print('未実行の予定はありません。')
         return
 
     schedules = [s for (i,s) in select]
@@ -64,8 +64,10 @@ def done(schedule_list, args, filters):
     print('実行済みの予定を番号で選択してください。')
     print('複数選択する場合、半角スペースで区切ってください。')
     print()
+    # 選択画面の数字を右揃えにする
+    align = '{:>' + str(len(str(len(schedules)-1))) + '}:'
     def fields(s):
-        return (str(numbers[id(s)]) + ':',) + s.fields()
+        return (align.format(numbers[id(s)]),) + s.fields()
     table = schedule.make_field_table(schedules, lambda x:True, fields)
     schedule.print_fields(table, False)
     print()
@@ -81,7 +83,7 @@ def done(schedule_list, args, filters):
     filter = schedule.make_filter(filters, [schedules[n] for n in done_nums])
     def fields(s):
         if numbers.get(id(s)) in done_nums:
-            return ('*',) + s.fields()
+            return ('D',) + s.fields()
         elif s.done:
             return ('d',) + s.fields()
         else:
@@ -114,7 +116,7 @@ sch a 20110520 e 微積分の中間試験
 yyyymmdd : 年月日を指定
 mmdd     : 本日以降の直近の月日を指定
 mdd      : 本日以降の直近の月日を指定
-優先度は直接数値で指定する他、以下の略記が使える
+優先度(NICE値)は直接数値で指定する他、以下の略記が使える
 e:最優先(Extreme) h:高(High) n:通常(Normal) l:低(Low)
 """
 parser_add = subparsers.add_parser(

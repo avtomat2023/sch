@@ -43,23 +43,14 @@ class Schedule:
     def is_urgent(self):
         today = JaDate.today()
         day = lambda d: timedelta(days=d)
-        if   self.priority in PRIORITY_EXTREME_RANGE:
+        if self.priority in PRIORITY_EXTREME_RANGE:
             return True
         elif self.priority in PRIORITY_HIGH_RANGE:
-            if self.date - today <= day(30):
-                return True
-            else:
-                return False
+            return self.date - today <= day(30)
         elif self.priority in PRIORITY_NORMAL_RANGE:
-            if self.date - today <= day(7):
-                return True
-            else:
-                return False
+            return self.date - today <= day(7)
         elif self.priority in PRIORITY_LOW_RANGE:
-            if self.date - today <= day(3):
-                return True
-            else:
-                return False
+            return self.date - today <= day(3)
         else:
             assert False, "Program Error"
 

@@ -45,7 +45,7 @@ class Schedule:
 
     def fields(self):
         date = self.date.format('{year}/{month:02}/{day:02}({weekday})')
-        return [date, str(self.priority), self.todo]
+        return (date, str(self.priority), self.todo)
 
     # 過去の予定に関しては、Trueを返す
     def is_urgent(self):

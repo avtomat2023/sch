@@ -1,19 +1,10 @@
 #!/usr/bin/env python3
-"""
-追加要求
-優先度略記
-"""
-
-"""
-sch - スケジュール管理プログラム
-      日付が変わる前後に使うと、まずいことになる
-"""
-
-from argparse import ArgumentParser
 import schedule
 import sys
 import os
 import os.path
+from operator import methodcaller
+from argparse import ArgumentParser
 
 def filter_past(sch):
     return sch.date >= schedule.TODAY
@@ -29,7 +20,7 @@ DATAFILENAME = os.path.join(os.path.dirname(__file__), 'schedule-list')
 def show(schedule_list, args, filters):
     filter = schedule.make_filter(filters, [])
     table = schedule.make_field_table(schedule_list, filter,
-                                      lambda s: tuple(s.fields()))
+                                      methodcaller('fields'))
     schedule.print_fields(table)
 
 def add(schedule_list, args, filters):
@@ -63,7 +54,7 @@ sch a 20110520 e 微積分の中間試験
 yyyymmdd : 年月日を指定
 mmdd     : 本日以降の直近の月日を指定
 mdd      : 本日以降の直近の月日を指定
-優先度は直接数値で指定する他、以下の略記が使える（未実装）
+優先度は直接数値で指定する他、以下の略記が使える
 e:最優先(Extreme) h:高(High) n:通常(Normal) l:低(Low)
 """
 parser_add = subparsers.add_parser(

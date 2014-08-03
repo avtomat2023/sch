@@ -16,7 +16,7 @@ def filter_low_priority(sch):
 def filter_done(sch):
     return not sch.done
 
-DATAFILENAME = os.path.join(os.path.dirname(__file__), 'schedule-list')
+DATAFILENAME = os.path.join(os.path.dirname(__file__), 'schedules.txt')
 
 def show(schedule_list, args, filters):
     if args.show_done:

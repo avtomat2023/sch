@@ -26,3 +26,11 @@ class TestJaDate(unittest.TestCase):
             self.assertEqual(d2.year, today.year + 1)
             self.assertEqual(d2.month, d1.month)
             self.assertEqual(d2.day, d1.day)
+
+    def testFormat(self):
+        date = JaDate(2014, 8, 3)
+        s = date.format('{year}/{month:02}/{day:02}')
+        self.assertEqual(s, '2014/08/03')
+
+if __name__ == '__main__':
+    unittest.main()

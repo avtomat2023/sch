@@ -33,3 +33,6 @@ class JaDate(datetime.date):
     WEEKDAYS = ("月", "火", "水", "木", "金", "土", "日")
     def ja_weekday(self):
         return JaDate.WEEKDAYS[self.weekday()]
+
+    def format(self, format):
+        return format.format(year=self.year, month=self.month, day=self.day)

@@ -35,4 +35,5 @@ class JaDate(datetime.date):
         return JaDate.WEEKDAYS[self.weekday()]
 
     def format(self, format):
-        return format.format(year=self.year, month=self.month, day=self.day)
+        return format.format(year=self.year, month=self.month, day=self.day,
+                             weekday=self.ja_weekday())

@@ -33,8 +33,17 @@ class Schedule:
     @classmethod
     def from_input(cls, date, priority, todo):
         if priority.lower() in Schedule.PRIORITY_TABLE:
-            priority = Schedule.PRIORITY_TABLE[priority]
-        return cls(False, JaDate.from_str(date, TODAY), int(priority), todo)
+            p = Schedule.PRIORITY_TABLE[priority]
+        else:
+            p = int(priority)
+
+        if p not in PRIORITY_RANGE:
+            msg = ('priority p must be ' + str(PRIORITY_RANGE.start) +
+                   ' <= p < ' + str(PRIORITY_RANGE.stop) +
+                   ', but ' + str(p) + ' given')
+            raise ValueError(msg)
+
+        return cls(False, JaDate.from_str(date, TODAY), p, todo)
 
     # 直接ファイルに書き出せる形式
     def __str__(self):
@@ -66,6 +75,13 @@ def read_schedule_file(filename):
     with open(filename) as f:
         schedules = [Schedule.from_record(line) for line in f if line]
     return schedules
+
+def write_to_schedule_file(schedule_list, filename):
+    tmp = '__tmpfile__'
+    with open(tmp, 'w') as f:
+        for s in schedule_list:
+            print(s, file=f)
+    os.replace(tmp, filename)
 
 # Scheduleのリストから、リストを表示するために必要なフィールドのリストを作る
 # 例えば、以下の予定リストがあったとする。
@@ -114,5 +130,5 @@ def print_fields(field_table):
     for fields in field_table:
         for field, width in zip(fields, widths):
             s = field + ' ' * (width - strwidth(field))
-            print(s, end='  ')
+            print(s, end=' ')
         print()

@@ -3,6 +3,7 @@ import schedule
 import sys
 import os
 import os.path
+import bisect
 from operator import methodcaller
 from argparse import ArgumentParser
 
@@ -24,7 +25,21 @@ def show(schedule_list, args, filters):
     schedule.print_fields(table)
 
 def add(schedule_list, args, filters):
-    print('command add:', args)
+    to_add = schedule.Schedule.from_input(args.date, args.priority, args.todo)
+    keys = [s.date for s in schedule_list]
+    i = bisect.bisect_right(keys, to_add.date)
+    schedule_list.insert(i, to_add)
+    schedule.write_to_schedule_file(schedule_list, DATAFILENAME)
+
+    print('予定を追加しました。')
+    filter = schedule.make_filter(filters, [to_add])
+    def fields(s):
+        if s is to_add:
+            return ('*',) + s.fields()
+        else:
+            return ('',) + s.fields()
+    table = schedule.make_field_table(schedule_list, filter, fields)
+    schedule.print_fields(table)
 
 def done(schedule_list, args, filters):
     print('command done:', args)

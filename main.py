@@ -10,20 +10,33 @@ sch - スケジュール管理プログラム
 """
 
 from argparse import ArgumentParser
-from schedule import ScheduleList
+import schedule
 import sys
 import os
+import os.path
 
-# DATAFILENAME = os.getenv("MYTOOL") + '/sch/schedule-list'
-DATAFILENAME = os.getenv("MYTOOL") + '/sch2/test'
+def filter_past(sch):
+    return sch.date >= schedule.TODAY
 
-def show(args):
-    print('no command:', args)
+def filter_low_priority(sch):
+    return sch.is_urgent()
 
-def add(args):
+def filter_done(sch):
+    return not sch.done
+
+# DATAFILENAME = os.path.join(os.getenv("MYTOOL"), 'sch/schedule-list')
+DATAFILENAME = os.path.join(os.getenv("MYTOOL"), 'sch2/schedule-list')
+
+def show(schedule_list, filters):
+    filter = schedule.make_filter(filters, [])
+    table = schedule.make_field_table(schedule_list, filter,
+                                      lambda s: tuple(s.fields()))
+    schedule.print_fields(table)
+
+def add(schedule_list, filters):
     print('command add:', args)
 
-def done(args):
+def done(schedule_list, filters):
     print('command done:', args)
 
 parser = ArgumentParser(description='コマンドラインベースTODOマネージャ',
@@ -31,7 +44,7 @@ parser = ArgumentParser(description='コマンドラインベースTODOマネー
 
 parser.add_argument(
     '-a', '--show-all', action='store_true',
-    help='直近のものだけでなく、すべての予定を表示します'
+    help='直近のものだけでなく、今後すべての予定を表示します'
 )
 parser.add_argument(
     '-d', '--show-done', action='store_true',
@@ -82,10 +95,19 @@ parser_done.set_defaults(subcommand=done)
 
 if __name__ == '__main__':
     args = parser.parse_args()
+
+    schedule_list = schedule.read_schedule_file(DATAFILENAME)
+
+    filters = [filter_past]
+    if not args.show_all:
+        filters.append(filter_low_priority)
+    if not args.show_done:
+        filters.append(filter_done)
+
     if 'subcommand' in args:
-        args.subcommand(args)
+        args.subcommand(schedule_list, filters)
     else:
-        show(args)
+        show(schedule_list, filters)
 
     """
     scheduleList = ScheduleList(DATAFILENAME)

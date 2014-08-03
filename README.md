@@ -56,7 +56,6 @@
 ヘルプ
 
     $ sch --help
-    
     usage: sch [-a] [-d] [-h] {add,a,done,d} ...
 
     コマンドラインベースTODOマネージャ
@@ -70,3 +69,13 @@
       -a, --show-all   直近のものだけでなく、今後すべての予定を表示します
       -d, --show-done  実行済みの予定も表示します
       -h, --help       このヘルプメッセージを表示します
+    $ sch add --help
+    usage: sch add [-h] date priority todo
+
+    positional arguments:
+      date        日付（指定方法:20140803 0803 803）
+      priority    NICE値（e=-18, h=-10, n=0, l=10）
+      todo        用事
+
+    optional arguments:
+      -h, --help  このヘルプメッセージを表示します
